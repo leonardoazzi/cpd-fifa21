@@ -10,6 +10,7 @@ import Hash_Table, Trie_Tree, TableIt
 import sys, os, csv, time
 from operator import itemgetter
 import pandas as pd
+import streamlit as st
 
 # FUNCTIONS ------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -123,6 +124,10 @@ def Search_4(user_input, hash_table, output):
 
     return output
 
+
+# APPLICATION ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
 # DATA PROCESSING ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 os.system('cls||clear')
@@ -138,14 +143,17 @@ top_bottom_player_positions, list_of_tags, output = [], [], []
 counter = 0
 error = False
 
-with open(os.path.join(sys.path[0], "rating.csv"), encoding = "utf8") as csv_file:
+# with open(os.path.join(sys.path[0], "rating.csv"), encoding = "utf8") as csv_file:
+with open("rating.csv") as csv_file:
 
-    end = len(pd.read_csv(os.path.join(sys.path[0], "rating.csv")))
+    # end = len(pd.read_csv(os.path.join(sys.path[0], "rating.csv")))
+    end = len(pd.read_csv("rating.csv"))
     times_rated, rating_sum, global_rating = 0, 0, 0
     csv_reader = csv.reader(csv_file, delimiter = ",")
     next(csv_reader)
 
-    with open(os.path.join(sys.path[0], "rating.csv"), encoding = "utf8") as auxiliary_csv_file:
+    with open("rating.csv") as auxiliary_csv_file:
+    # with open(os.path.join(sys.path[0], "rating.csv"), encoding = "utf8") as auxiliary_csv_file:
 
         auxiliary_csv_reader = csv.reader(auxiliary_csv_file, delimiter = ",")
         next(auxiliary_csv_reader)
@@ -167,7 +175,8 @@ with open(os.path.join(sys.path[0], "rating.csv"), encoding = "utf8") as csv_fil
                 hash_table_1.insert(item, sofifa_id, 0)
                 times_rated, rating_sum, global_rating = 0, 0, 0
 
-with open(os.path.join(sys.path[0], "players.csv"), encoding = "utf8") as csv_file:
+with open("players.csv") as csv_file:
+# with open(os.path.join(sys.path[0], "players.csv"), encoding = "utf8") as csv_file:
 
     csv_reader = csv.reader(csv_file, delimiter = ",")
     next(csv_reader)
@@ -183,14 +192,17 @@ with open(os.path.join(sys.path[0], "players.csv"), encoding = "utf8") as csv_fi
         hash_table_3.insert(item, sofifa_id, 0)
         top_bottom_player_positions.append(item)
 
-with open(os.path.join(sys.path[0], "tags.csv"), encoding = "utf8") as csv_file:
+with open("tags.csv") as csv_file:
+# with open(os.path.join(sys.path[0], "tags.csv"), encoding = "utf8") as csv_file:
 
     counter = 0
-    end = len(pd.read_csv(os.path.join(sys.path[0], "tags.csv")))
+    end = len(pd.read_csv("tags.csv"))
+    # end = len(pd.read_csv(os.path.join(sys.path[0], "tags.csv")))
     csv_reader = csv.reader(csv_file, delimiter = ",")
     next(csv_reader)
 
-    with open(os.path.join(sys.path[0], "tags.csv"), encoding = "utf8") as auxiliary_csv_file:
+    with open( "tags.csv") as auxiliary_csv_file:
+    # with open(os.path.join(sys.path[0], "tags.csv"), encoding = "utf8") as auxiliary_csv_file:
 
         auxiliary_csv_reader = csv.reader(auxiliary_csv_file, delimiter = ",")
         next(auxiliary_csv_reader)
@@ -239,16 +251,19 @@ ending_time = time.time()
 time_taken = '{:.6f}'.format(ending_time - starting_time)
 os.system('cls||clear')
 
-# APPLICATION ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# Display_Menu()
+# user_input = input("Input the functioanlity: ").split(" ", 1)
 
-while True:
-
-    Display_Menu()
-    user_input = input("Input the functioanlity: ").split(" ", 1)
+@st.cache
+def search(user_input):
+    global output
+    
+    user_input = user_input.split(" ", 1)
 
     if user_input[0] == "player":
 
         output = Search_1(user_input[1], trie_tree, hash_table_2, output)
+        return output
 
     elif user_input[0][0:3] == "top" and user_input[0][3:].isdigit():
 
@@ -292,7 +307,7 @@ while True:
 
         output.clear()
         os.system('cls||clear')
-        break
+        return 0
 
     else:
 
@@ -301,3 +316,10 @@ while True:
         os.system('cls||clear')
 
 print("Calling all. This is our last cry before our eternal silence.")
+# Display_Menu()
+# user_input = input("Input the functioanlity: ").split(" ", 1)
+# main(user_input)
+
+
+if __name__ == "__main__":
+    main()
