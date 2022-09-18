@@ -30,7 +30,7 @@ class TrieTree(object):
         
         node.is_end = True
         
-    def dfs(self, node, prefix):
+    def depth_first_search(self, node, prefix):
 
         if node.is_end:
 
@@ -38,9 +38,9 @@ class TrieTree(object):
         
         for child in node.children.values():
 
-            self.dfs(child, prefix + node.char)
+            self.depth_first_search(child, prefix + node.char)
         
-    def query(self, x):
+    def words_from_prefixe(self, x):
 
         self.output = []
         node = self.root
@@ -55,6 +55,6 @@ class TrieTree(object):
 
                 return []
         
-        self.dfs(node, x[:-1])
+        self.depth_first_search(node, x[:-1])
 
-        return sorted(self.output, key=lambda x: x[1], reverse=True)
+        return sorted(self.output, key = lambda x: x[1], reverse = True)

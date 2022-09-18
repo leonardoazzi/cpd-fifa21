@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import Final_Project_V1 as proc
+import Final_Project as proc
 
 def main():
 
@@ -18,7 +18,6 @@ def main():
     placeholder = st.empty()
 
     if(command != ""):
-        st.dataframe([""])
         with st.spinner("Preparando o lance..."):
             data = proc.search(command)
             with placeholder.container():

@@ -5,7 +5,7 @@ class HashTable(object):
         self.items = [None] * size
         self.size = size
 
-    def insert(self, item, key, pivot):
+    def insert(self, item, key):
 
         index = self.hash(key)
 
@@ -13,42 +13,45 @@ class HashTable(object):
 
             self.items[index] = [item]
 
-        elif self.items[index][0][pivot] == key:
-            
+        else:
+
             self.items[index].append(item)
+
+    def search(self, key, pivot, return_list):
+
+        index = self.hash(key)
+        output_list = []
+
+        if self.items[index] is None:
+
+            return None
+
+        elif return_list == True:
+
+            for item in self.items[index]:
+
+                if item[pivot] == key:
+
+                    output_list.append(item)
+
+            if len(output_list) == 0:
+
+                return None
+
+            else:
+                
+                return output_list
 
         else:
 
-            while True:
+            for item in self.items[index]:
 
-                index = (index + 1) % self.size
+                if item[pivot] == key:
 
-                if self.items[index] is None:
+                    return item
 
-                    self.items[index] = [item]
-                    break
+            return None
 
-                if self.items[index] is not None and self.items[index][0][pivot] == key:
-
-                    self.items[index].append(item)
-                    break
-
-    def search(self, key, pivot):
-
-        index = self.hash(key)
-
-        if self.items[index][0][pivot] == key:
-
-            return self.items[index]
-
-        while True:
-
-            index = (index + 1) % self.size
-
-            if self.items[index] is not None and self.items[index][0][pivot] == key:
-
-                return self.items[index]
-                
     def hash(self, key):
 
         hashsum = 0
