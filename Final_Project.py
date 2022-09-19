@@ -16,15 +16,13 @@ def Display_Menu():
 
     print(
 
-        "The application took " + str(time_taken) + " seconds to process the data.\n\n"
+        "A aplicação demorou " + str(time_taken) + " segundos para processar os dados.\n\n"
         "INF01124: FINAL PROJECT\n\n"
-        "Functionalities:\n\n"
+        "Funcionalidades:\n\n"
         "1. player <name or prefix>\n"
-        "2. user top <userID>\n"
-        "3. user bottom <userID>\n"
-        "4. top<N> ‘<position>’\n"
-        "5. bottom<N> ‘<position>’\n"
-        "6. tags <list of tags>\n"
+        "2. user <userID>\n"
+        "3. top<N> ‘<position>’\n"
+        "4. tags <list of tags>\n"
         
     )
 
@@ -48,7 +46,11 @@ def Search_1(user_input, trie_tree, hash_table, output):
 def Search_2(user_input, direction, hash_table_1, hash_table_2, output):
 
     output.append(["SOFIFA ID", "NAME", "GLOBAL RATING", "TIMES RATED", "RATING"])
-    information_1 = Sort_Information(hash_table_1.search(user_input, 0, True), 2)
+    
+    info = hash_table_1.search(user_input, 0, True)
+
+    information_1 = Sort_Information(info, 2)
+
     counter = 0
 
     for item_1 in information_1[::direction]:
@@ -68,7 +70,7 @@ def Search_2(user_input, direction, hash_table_1, hash_table_2, output):
 
 def Search_3(user_input, direction, top_bottom_x, top_bottom_player_positions, output):
 
-    output.append(["SOFIDA ID", "NAME", "PLAYER POSITIONS", "GLOBAL RATING", "TIMES RATED"])
+    output.append(["SOFIFA ID", "NAME", "PLAYER POSITIONS", "GLOBAL RATING", "TIMES RATED"])
     player_positions = user_input[1:-1].split(", ")
     counter = 0
 
@@ -91,30 +93,40 @@ def Search_3(user_input, direction, top_bottom_x, top_bottom_player_positions, o
 
     return output
 
+# Pesquisa sobre tags
 def Search_4(user_input, hash_table, output):
 
-    output.append(["SOFIDA ID", "NAME", "PLAYER POSITIONS", "GLOBAL RATING", "TIMES RATED"])
+    output.append(["SOFIFA ID", "NAME", "PLAYER POSITIONS", "GLOBAL RATING", "TIMES RATED"])
     counter = 0
 
     for pivot_item in hash_table.search(user_input[0], 5, True):
 
         pivot_item = pivot_item[:5]
+        # print(pivot_item)
 
-        for tag in user_input[1:]:
+        # Se apenas uma tag for inserida
+        if (len(user_input) == 1):
+            
+            output.append(pivot_item)
 
-            for item in hash_table.search(tag, 5, True):
+        # Se duas ou mais tags forem inseridas, faz o match
+        else:
 
-                item = item[:5]
+            for tag in user_input[1:]:
+                
+                for item in hash_table.search(tag, 5, True):
 
-                if pivot_item == item:
+                    item = item[:5]
 
-                    counter += 1
+                    if pivot_item == item:
 
-                    if counter == len(user_input) - 1:
+                        counter += 1
 
-                        counter = 0
-                        output.append(pivot_item)
-                        break
+                        if counter == len(user_input) - 1:
+
+                            counter = 0
+                            output.append(pivot_item)
+                            break
             
         counter = 0
 
@@ -134,15 +146,15 @@ trie_tree = Trie_Tree.TrieTree()
 top_bottom_player_positions, list_of_tags, output = [], [], []
 error = False
 
-# with open(os.path.join(sys.path[0], "minirating.csv"), encoding = "utf8") as csv_file:
-with open("minirating.csv") as csv_file:
+# with open(os.path.join(sys.path[0], "rating.csv"), encoding = "utf8") as csv_file:
+with open("rating.csv") as csv_file:
 
     times_rated, rating_sum, global_rating = 0, 0, 0
     csv_reader = csv.reader(csv_file, delimiter = ",")
     next(csv_reader)
 
-    # with open(os.path.join(sys.path[0], "minirating.csv"), encoding = "utf8") as auxiliary_csv_file:
-    with open("minirating.csv") as auxiliary_csv_file:
+    # with open(os.path.join(sys.path[0], "rating.csv"), encoding = "utf8") as auxiliary_csv_file:
+    with open("rating.csv") as auxiliary_csv_file:
 
         auxiliary_csv_reader = csv.reader(auxiliary_csv_file, delimiter = ",")
         next(auxiliary_csv_reader)
@@ -236,6 +248,8 @@ top_bottom_player_positions = Sort_Information(top_bottom_player_positions, 3)
 ending_time = time.time()
 time_taken = '{:.6f}'.format(ending_time - starting_time)
 os.system('cls||clear')
+Display_Menu()
+
 
 # APPLICATION ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -244,39 +258,78 @@ def search(user_input):
 
     output.clear()
 
-    # Display_Menu()
+    Display_Menu()
     # user_input = input("Input the functioanlity: ").split(" ", 1)
-    user_input = user_input.split(" ", 1)
 
-    if user_input[0] == "player":
+    user_input = user_input.split(" ") # Cria um array de palavras
+    print("Input: ", user_input)
 
-        output = Search_1(user_input[1], trie_tree, hash_table_2, output)
+    # Comando
+    type_input = user_input[0]  # player / user / top<N> / tags
 
-    elif user_input[0][0:4] == "user" and user_input[1][0:3] == "top" and user_input[1][4:].isdigit():
+    # Parâmetro
+    param_input = user_input[1:] # <name> / <userID> / '<position>' / <list of tags>
 
-        direction = 1
-        output = Search_2(user_input[1][4:], direction, hash_table_x, hash_table_3, output)
+    # 2.1 Pesquisas sobre o nome de jogadores
+    # player <name or prefix>
+    if type_input == "player":
+        
+        output = Search_1(param_input[0], trie_tree, hash_table_2, output)
 
-    elif user_input[0][0:4] == "user" and user_input[1][0:6] == "bottom" and user_input[1][7:].isdigit():
+    # 2.2 Pesquisas sobre jogadores revisados por usuários
+    # Esta pesquisa deve retornar a lista com no máximo 20 jogadores revisados pelo usuário e para
+    # cada jogador mostrar a nota dada pelo usuário, a média global e a contagem de avaliações. A
+    # lista deve ser ordenada pela nota dada pelo usuário de maneira decrescente (maiores notas
+    # primeiro). 
+    #
+    # user <userID>
+    elif type_input == "user":
+        
+        quant_input = param_input[0]
 
-        direction = -1
-        output = Search_2(user_input[1][7:], direction, hash_table_x, hash_table_3, output)
+        if quant_input.isdigit():
+            direction = 1
+            output = Search_2(quant_input, direction, hash_table_x, hash_table_3, output)
+        else:
+            print("\nInvalid input!")
+            error = True
+            return
 
-    elif user_input[0][0:3] == "top" and user_input[0][3:].isdigit():
+    # 2.3 Pesquisas sobre os melhores jogadores de uma determinada posição
+    # Esta pesquisa tem por objetivo retornar a lista de jogadores com melhores notas de uma dada
+    # posição. Para evitar que um jogador seja retornando com uma boa média mas com poucas
+    # avaliações, esta consulta somente deve retornar os melhores jogadores com no mínimo 1000
+    # avaliações. Para gerenciar o número de jogadores a serem retornados, a consulta deve
+    # receber como parâmetro um número N que corresponde ao número máximo de jogadores a
+    # serem retornados. O resultado da consulta deve estar ordenado da maior para a menor
+    # avaliação. 
+    # 
+    # top<N> '<position>'
+
+    elif type_input[0:3] == "top" and type_input[3:].isdigit():
+
+        n_input = user_input[0][3:]
+        pos_input = user_input[1]
 
         direction, top_bottom_x = 1, user_input[0][3:]
-        output = output = Search_3(user_input[1], direction, top_bottom_x, top_bottom_player_positions, output)
+        output = output = Search_3(n_input, direction, top_bottom_x, top_bottom_player_positions, output)
 
-    elif user_input[0][0:6] == "bottom" and user_input[0][6:].isdigit():
+    # 2.4 Pesquisas sobre ‘tags’ de jogadores
+    # Esta pesquisa tem por objetivo explorar a lista de tags adicionadas por cada usuário em cada
+    # revisão. Para uma lista de tags dada como entrada, a pesquisa deve retornar a lista de
+    # jogadores que estão associados a interseção de um conjunto de tags.
+    #
+    # tags <list of tags>
 
-        direction, top_bottom_x = -1, user_input[0][6:]
-        output = output = Search_3(user_input[1], direction, top_bottom_x, top_bottom_player_positions, output)
+    elif type_input == "tags":
 
-    elif user_input[0] == "tags":
+        input = []
 
-        user_input = user_input[1][1:-1].split("' '")
-        print(user_input)
-        output = Search_4(user_input, hash_table_4, output)
+        for idx, line in enumerate(param_input):
+            tags = param_input[idx].strip("''")
+            input.append(tags)
+
+        output = Search_4(input, hash_table_4, output)
 
     else:
 
@@ -292,18 +345,16 @@ def search(user_input):
         return output
         
 
-    user_input = input("\nInput 'E' to finish the application or input anything else to continue the application: ")
+    # user_input = input("\nInput 'E' to finish the application or input anything else to continue the application: ")
 
-    if user_input == "E":
+    # if user_input == "E":
 
-        output.clear()
-        os.system('cls||clear')
-        return 0
+    #     output.clear()
+    #     os.system('cls||clear')
+    #     return 0
 
-    else:
+    # else:
 
-        output.clear()
-        error = False
-        os.system('cls||clear')
-
-print("Calling all. This is our last cry before our eternal silence.")
+        # output.clear()
+        # error = False
+        # os.system('cls||clear')
